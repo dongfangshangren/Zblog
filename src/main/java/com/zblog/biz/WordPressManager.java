@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,7 @@ import com.zblog.service.OptionsService;
  */
 @Component
 public class WordPressManager{
+	private static final Logger logger = LoggerFactory.getLogger(WordPressManager.class);
   @Autowired
   private UploadManager uploadManager;
   @Autowired
@@ -134,6 +137,7 @@ public class WordPressManager{
     p.setContent(content);
 
     List<String> tags = post.get("tags");
+    //logger.debug("post:"+p.toString());
     postManager.insertPost(p, PostTagHelper.from(p, tags, p.getCreator()));
   }
 

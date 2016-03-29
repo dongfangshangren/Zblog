@@ -1,5 +1,7 @@
 package com.zblog.core.dal.entity;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import com.zblog.core.dal.constants.PostConstants;
 
 /**
@@ -108,4 +110,12 @@ public class Post extends BaseEntity{
     this.rcount = rcount;
   }
 
+@Override
+public String toString() {
+	return ReflectionToStringBuilder.toString(this); 
+}
+
+  
+  
+  
 }
