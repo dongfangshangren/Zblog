@@ -19,6 +19,7 @@ import com.zblog.core.dal.constants.PostConstants;
 import com.zblog.core.dal.entity.User;
 import com.zblog.core.plugin.MapContainer;
 import com.zblog.core.util.CookieUtil;
+import com.zblog.core.util.ServletUtils;
 import com.zblog.core.util.StringUtils;
 import com.zblog.service.CommentService;
 import com.zblog.service.PostService;
@@ -82,6 +83,10 @@ public class BackendController{
     SecurityUtils.getSubject().logout();
     CookieUtil cookieUtil = new CookieUtil(request, response);
     cookieUtil.removeCokie(Constants.COOKIE_CSRF_TOKEN);
+    cookieUtil.removeCokie("comment_author");
+    cookieUtil.removeCokie("comment_author_email");
+    cookieUtil.removeCokie("comment_author_url");
+    
     return "redirect:/backend/login?msg=logout";
   }
 
@@ -101,7 +106,12 @@ public class BackendController{
 
     SecurityUtils.getSubject().login(new StatelessToken(user.getId(), user.getPassword()));
     CookieUtil cookieUtil = new CookieUtil(request, response);
+    /* 根据RFC-2109中的规定，在Cookie中只能包含ASCII的编码 */
     cookieUtil.setCookie(Constants.COOKIE_USER_NAME, form.getUsername(), false, 7 * 24 * 3600);
+    cookieUtil.setCookie("comment_author", user.getNickName(), "/", false, 365 * 24 * 3600);
+    cookieUtil.setCookie("comment_author_email", user.getEmail(), "/", false, 365 * 24 * 3600, false);
+    cookieUtil.setCookie("comment_author_url", ServletUtils.getDomain(request), "/", false, 365 * 24 * 3600, false);
+
     CookieRemberManager.loginSuccess(request, response, user.getId(), user.getPassword(), form.isRemeber());
 
     return "redirect:" + StringUtils.emptyDefault(form.getRedirectURL(), "/backend/index");
