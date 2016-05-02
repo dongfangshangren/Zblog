@@ -72,8 +72,9 @@ public final class WordPressReader{
         String title = item.getElementsByTagName("title").item(0).getTextContent();
         map.put("title", title);
         String pubDate = item.getElementsByTagName("pubDate").item(0).getTextContent();
-        map.put("pubDate", DateUtils.parse(pubDate, "EEE, dd MMM yyyy HH:mm:ss Z", Locale.US));
-
+       // map.put("pubDate", DateUtils.parse(pubDate, "EEE, dd MMM yyyy HH:mm:ss Z", Locale.US));
+       //"Sat, 17 Apr 2010 03:33:52 +0000"
+        map.put("pubDate", DateUtils.parse("E, dd MMM yyyy HH:mm:ss Z",pubDate, Locale.ENGLISH));
         String itemType = item.getElementsByTagName("wp:post_type").item(0).getTextContent();
         map.put("itemType", itemType);
         if("attachment".equals(itemType)){

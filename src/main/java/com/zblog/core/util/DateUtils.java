@@ -64,5 +64,17 @@ public class DateUtils{
 
     return result;
   }
+  
+  public static void main(String[] args){
+	  SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z",Locale.ENGLISH);
+	  format.setLenient(false);
+	  Date result = parse("E, dd MMM yyyy HH:mm:ss Z","Sat, 17 Apr 2010 03:33:52 +0000",Locale.ENGLISH);
+	    try{
+	      //result = format.parse("Sat, 17 Apr 2010 03:33:52 +0000");
+	      System.out.println(result.toLocaleString());
+	    }catch(Exception e){
+	      e.printStackTrace();
+	    }
+  }
 
 }

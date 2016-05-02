@@ -49,3 +49,9 @@ a java blog
   
 ### 作者博客
   (http://www.zhouhaocheng.cn)
+  
+###  后台访问路径
+http://localhost:8080/zblog/backend/login?guard=no
+默认后台账号admin/12346
+因为后台未使用验证码登录，为防止暴力破解，在后台登录，请带上登录参数，如www.yourdomain/backend/login?guard=no
+其中‘no’值在/src/main/resources/config/spring-service.xml 文件中配置

@@ -100,6 +100,7 @@ INSERT INTO `options` VALUES ('subtitle','subtitle','Just another zblog website'
 INSERT INTO `options` VALUES ('description','description','Spring Mybatis Ehcache Shiro Lucene FreeMarker');
 INSERT INTO `options` VALUES ('allowComment','allowComment','true');
 INSERT INTO `options` VALUES ('maxshow','maxshow','10');
+INSERT INTO `options` VALUES ('post_defaultCategory','post_defaultCategory','Mf2DuehP8rWqS8EzyXb'); -- add by chendalei
 -- ----------------------------
 -- Table structure for `post`
 -- ----------------------------
@@ -194,3 +195,11 @@ INSERT INTO `user` VALUES ('uHHi9gvg81UXn4PLlLE', 'admin', '东方上人', 'e10a
 -- ----------------------------
 DROP VIEW IF EXISTS `view_category`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_category` AS select `n`.`id` AS `id`,`n`.`name` AS `name`,count(`n`.`id`) AS `level`,`n`.`visible` AS `visible` from (`category` `n` join `category` `p`) where (`n`.`leftv` between `p`.`leftv` and `p`.`rightv`) group by `n`.`id` order by `n`.`leftv` ;
+
+-- alter 修改表字段 
+ALTER TABLE `zblog`.`tag` 
+CHANGE COLUMN `name` `name` VARCHAR(32) NOT NULL ;
+ALTER TABLE `zblog`.`post` 
+CHANGE COLUMN `excerpt` `excerpt` VARCHAR(500) NULL DEFAULT NULL ;
+ALTER TABLE `zblog`.`post` 
+CHANGE COLUMN `content` `content` LONGTEXT NOT NULL ;

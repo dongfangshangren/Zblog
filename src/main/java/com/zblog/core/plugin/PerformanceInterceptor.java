@@ -1,9 +1,12 @@
 package com.zblog.core.plugin;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -48,8 +51,8 @@ public class PerformanceInterceptor implements Interceptor{
     String statementId = mappedStatement.getId();
     BoundSql boundSql = mappedStatement.getBoundSql(parameter);
     Configuration configuration = mappedStatement.getConfiguration();
-    String sql = getSql(boundSql, parameter, configuration);
-
+    //String sql = getSql(boundSql, parameter, configuration);
+    String sql = showSql(configuration, boundSql) ;
     long start = System.currentTimeMillis();
     Object result = invocation.proceed();
     long timing = System.currentTimeMillis() - start;
@@ -67,7 +70,9 @@ public class PerformanceInterceptor implements Interceptor{
   @Override
   public void setProperties(Properties properties){
   }
-
+  
+  
+  
   private String getSql(BoundSql boundSql, Object parameterObject, Configuration configuration){
     String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
@@ -107,8 +112,58 @@ public class PerformanceInterceptor implements Interceptor{
         result = propertyValue.toString();
       }
     }
-
     return sql.replaceFirst("\\?", result);
+  }
+  
+  
+  
+  private static String getParameterValue(Object obj) {
+      String value = null;
+      if (obj instanceof String) {
+          value = "'" + obj.toString() + "'";
+      } else if (obj instanceof Date) {
+          DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.CHINA);
+          value = "'" + formatter.format(new Date()) + "'";
+      } else {
+          if (obj != null) {
+        	  
+              value = obj.toString();
+          } else {
+              value = "";
+          }
+
+      }
+      return value;
+  }
+
+  public static String showSql(Configuration configuration, BoundSql boundSql) {
+      Object parameterObject = boundSql.getParameterObject();
+      List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+      String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
+      if (parameterMappings.size() > 0 && parameterObject != null) {
+          TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+          if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+              sql = sql.replaceFirst("\\?", getParameterValue(parameterObject));
+
+          } else {
+              MetaObject metaObject = configuration.newMetaObject(parameterObject);
+              for (ParameterMapping parameterMapping : parameterMappings) {
+                  String propertyName = parameterMapping.getProperty();
+                  if (metaObject.hasGetter(propertyName)) {
+                      Object obj = metaObject.getValue(propertyName);
+                      //sql = sql.replaceFirst("\\,*\\s*\\?", getParameterValue(obj));
+                      // 实用jdk原生方法replaceFirst部分情况下出现异常：named capturing group has 0 length name
+                      // 改用 org.apache.commons.lang3.StringUtils 代替
+                      sql = StringUtils.replaceOnce(sql, "\\?", getParameterValue(obj));
+                  } else if (boundSql.hasAdditionalParameter(propertyName)) {
+                      Object obj = boundSql.getAdditionalParameter(propertyName);
+                      //sql = sql.replaceFirst("\\?", getParameterValue(obj));
+                      sql = StringUtils.replaceOnce(sql, "\\?", getParameterValue(obj));
+                  }
+              }
+          }
+      }
+      return sql;
   }
 
 }
