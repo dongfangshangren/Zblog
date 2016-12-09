@@ -23,7 +23,7 @@ zblog.getDomainLink=function(path){
 zblog.newCsrf=function(){
   var csrfValue = (Math.random()+"").substring(2);
   /* 此处token值可以放在cookie中 */
-  $.cookie("x-csrf-token", csrfValue, {path:"/backend"});
+  $.cookie("x-csrf-token", csrfValue, {path:location.pathname});
   return csrfValue;
 }
 
